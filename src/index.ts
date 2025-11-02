@@ -3,6 +3,7 @@ import {Player} from './Player';
 import {Dice} from './Dice';
 import {SnakeLadderGameBuilder} from './SnakeLadderGame';
 
+import {SnakeLadderGame} from './SnakeLadderGame';
 
 const board = new Board(100, { 99: 21, 95: 75, 92: 88 }, { 2: 38, 4: 14, 9: 31 });
 const player1 = new Player('Rohit');
