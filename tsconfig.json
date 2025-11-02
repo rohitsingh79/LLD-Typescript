@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",                     // output JS version
+    "module": "CommonJS",                   // Node.js module system
+    "rootDir": "src",                       // your TS source folder
+    "outDir": "dist",                       // compiled JS output folder
+    "esModuleInterop": true,                // allow import default from CJS
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,                         // enable all strict type checks
+    "skipLibCheck": true,
+    "lib": ["ES2020", "DOM"]                // include modern JS + browser APIs
+  },
+  "baseUrl": "./src",
+  "paths": {
+    "*": ["*"],
+    "@shared/*": ["shared/*"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
