@@ -1,21 +1,23 @@
 import {Board} from './Board';
-import {Player} from './Player';
 import {Dice} from './Dice';
 import {SnakeLadderGameBuilder} from './SnakeLadderGame';
+import {FactoryPlayer} from "./Players/FactoryPlayer";
 
-import {SnakeLadderGame} from './SnakeLadderGame';
 
 const board = new Board(100, { 99: 21, 95: 75, 92: 88 }, { 2: 38, 4: 14, 9: 31 });
-const player1 = new Player('Rohit');
-const player2 = new Player('Kalpit');
+const factoryPlayer = new FactoryPlayer();
+const humanPlayer = factoryPlayer.createPlayer('human', 'Rohit');
+const AIPlayer = factoryPlayer.createPlayer('AI', 'Kalpit')
 
-const playersList:Array<Player> = [];
-playersList.push(player1);
-playersList.push(player2);
+const humanPlayer1 = factoryPlayer.createPlayer('human', 'singh');
+const AIPlayer1 = factoryPlayer.createPlayer('AI', 'shreya')
 
 const gameBuilder = new SnakeLadderGameBuilder();
-const game = gameBuilder.setPlayers(playersList).setBoard(board).setDice(new Dice()).build();
+const game = gameBuilder.addPlayer(humanPlayer).addPlayer(AIPlayer).setBoard(board).setDice(new Dice()).build();
+const game1 = gameBuilder.addPlayer(humanPlayer1).addPlayer(AIPlayer1).setBoard(board).setDice(new Dice()).build();
 game.play();
+
+console.log('is game 1 eqaul to game2' , game === game1)
 
 
 

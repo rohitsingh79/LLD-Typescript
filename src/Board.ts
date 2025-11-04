@@ -1,5 +1,5 @@
 export class Board{
-    private board:number;
+    private readonly  board:number;
     private snakes:Map<number , number>;
     private ladder:Map<number , number>;
 

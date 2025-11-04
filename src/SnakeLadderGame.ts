@@ -1,10 +1,11 @@
-import {Player} from './Player'
 import {Board} from './Board'
 import {Dice} from './Dice'
+import {PlayerInterface} from "./Players/PlayerInterface";
+
 
 //  builder pattern
 export class SnakeLadderGameBuilder {
-    public players:Array<Player>;
+    public players:Array<PlayerInterface>;
     public board:Board;
     public dice:Dice;
 
@@ -13,9 +14,10 @@ export class SnakeLadderGameBuilder {
         this.board = new Board(100 , {} , {});
         this.dice = new Dice();
     }
-    setPlayers(Players:Array<Player>){
-        this.players = Players;
+    addPlayer(Player:PlayerInterface){
+        this.players.push(Player);
         return this;
+
     }
     setBoard(Board:Board){
         this.board = Board;
@@ -27,18 +29,18 @@ export class SnakeLadderGameBuilder {
     }
 
     build(){
-        return new SnakeLadderGame(this)
+        return SnakeLadderGame.getInstance(this);
     }
 }
 
 export class SnakeLadderGame {
-    public players:Array<Player>;
+    public players:Array<PlayerInterface>;
     private board:Board;
     private playerTurn:number
     private dice:Dice
     private static instance:SnakeLadderGame | null = null;
 
-    constructor(SnakeLadderBuilder:SnakeLadderGameBuilder) {
+    private constructor(SnakeLadderBuilder:SnakeLadderGameBuilder) {
         this.players = SnakeLadderBuilder.players;
         this.board = SnakeLadderBuilder.board;
         this.dice = SnakeLadderBuilder.dice;
@@ -46,9 +48,9 @@ export class SnakeLadderGame {
     }
 
     // singleton patten
-    getInstance():SnakeLadderGame{
+    public static getInstance(snakeBuilder:SnakeLadderGameBuilder):SnakeLadderGame{
         if(!SnakeLadderGame.instance){
-            SnakeLadderGame.instance = new SnakeLadderGame(new SnakeLadderGameBuilder())
+            SnakeLadderGame.instance = new SnakeLadderGame(snakeBuilder)
         }
         return SnakeLadderGame.instance;
 
@@ -62,7 +64,7 @@ export class SnakeLadderGame {
 
     play(){
         while(!this.isGameComplete()){
-            const currPlayer: Player = this.players[this.playerTurn];
+            const currPlayer: PlayerInterface = this.players[this.playerTurn];
             console.log(currPlayer.getPlayerName())
             const diceNumber:number = this.dice.roll();
             const newPos:number = diceNumber+currPlayer.getPlayerPosition();
@@ -72,14 +74,14 @@ export class SnakeLadderGame {
             console.log('this.playerTurn', this.playerTurn);
         }
 
-        const player:Player | undefined = this.players.find((player:Player):boolean => player.getPlayerPosition() >= 100)
+        const player:PlayerInterface | undefined = this.players.find((player:PlayerInterface):boolean => player.getPlayerPosition() >= 100)
         if(player){
             console.log('winner is' , player?.getPlayerName())
         }
     }
 
     isGameComplete():boolean | undefined {
-        return !!this.players.find((player:Player):boolean => player.getPlayerPosition() >= 100);
+        return !!this.players.find((player:PlayerInterface):boolean => player.getPlayerPosition() >= 100);
     }
 
 
