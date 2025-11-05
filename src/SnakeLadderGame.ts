@@ -1,7 +1,16 @@
 import {Board} from './Board'
-import {Dice} from './Dice'
+import {Dice} from './Dice/Dice'
 import {PlayerInterface} from "./Players/PlayerInterface";
+import {MoveCommand} from "./CommandAction/MoveCommand";
+import {Command} from "./CommandAction/Command";
 
+
+// basic core functionality of snake and ladder game
+// roll the dice
+// check the position from the current + roll value that has come
+// update the respective player position
+// move on to the next player
+// check whether the current pos will mark it as complete
 
 //  builder pattern
 export class SnakeLadderGameBuilder {
@@ -34,7 +43,7 @@ export class SnakeLadderGameBuilder {
 }
 
 export class SnakeLadderGame {
-    public players:Array<PlayerInterface>;
+    private players:Array<PlayerInterface>;
     private board:Board;
     private playerTurn:number
     private dice:Dice
@@ -56,24 +65,13 @@ export class SnakeLadderGame {
 
     }
 
-    // roll the dice
-    // check the position from the current + roll value that has come
-    // update the respective player position
-    // move on to the next player
-    // check whether the current pos will mark it as complete
-
     play(){
         while(!this.isGameComplete()){
             const currPlayer: PlayerInterface = this.players[this.playerTurn];
-            console.log(currPlayer.getPlayerName())
-            const diceNumber:number = this.dice.roll();
-            const newPos:number = diceNumber+currPlayer.getPlayerPosition();
-            const updatedPos = this.board.getSnakeAndLadderPos(newPos);
-            currPlayer.setPlayerPosition(updatedPos);
+            const moveCommand:Command = new MoveCommand(currPlayer ,this.dice , this.board , currPlayer.getPlayerPosition());
+            moveCommand.execute();  // command pattern
             this.playerTurn = (this.playerTurn+1) % this.players.length;
-            console.log('this.playerTurn', this.playerTurn);
         }
-
         const player:PlayerInterface | undefined = this.players.find((player:PlayerInterface):boolean => player.getPlayerPosition() >= 100)
         if(player){
             console.log('winner is' , player?.getPlayerName())
