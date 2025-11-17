@@ -1,9 +1,9 @@
 export class Passenger {
-    private name:string
+    private readonly name:string
     constructor(name:string) {
         this.name = name
     }
-    getPassenger():void{
-        console.log(this.name)
+    getPassenger():string{
+        return this.name
     }
 }

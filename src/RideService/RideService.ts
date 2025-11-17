@@ -1,26 +1,23 @@
 
 import {Driver} from "./Driver";
 import {Passenger} from "./Passenger";
-import {Ride} from "./Ride";
-import {DriverStrategyInterface} from "./DriverSelector/DriverSelectorStrategyInterface";
-import {standardDriverSelector} from "./DriverSelector/StandardDriverSelector";
-
-// add the list of driver , passengers
-// search for the drivers based on the strategy
-// create a ride and add it to the ride list
+import {Ride, RideStatus} from "./Ride";
+import {DriverStrategyInterface} from "./DriverSelectorStrategy/DriverStrategyInterface";
+import {regularDriverSelector} from "./DriverSelectorStrategy/RegularDriverSelector";
+import {DriverSubject} from "./DriverObserver/DriverSubject";
 
 
 export class RideService {
     private drivers:Driver[]
     private passenger:Passenger[];
-    private rideList: Ride[];
     private driverSelectionStrategy:DriverStrategyInterface
+    private DriverNotifier:DriverSubject;
 
     constructor(){
         this.drivers = [];
         this.passenger = [];
-        this.rideList = [];
-        this.driverSelectionStrategy = new standardDriverSelector()
+        this.driverSelectionStrategy = new regularDriverSelector()
+        this.DriverNotifier = new DriverSubject()
     }
 
     addDriver(driver:Driver):void{
@@ -31,25 +28,37 @@ export class RideService {
         this.passenger.push(passenger);
     }
 
-    findDriver(start:string , end:string):Driver {
-        // 1. strategy check (premium , normal)
-        // 2. use the algorithms to find the nearest based in the strategy
-        // 3. filters the one who are busy
-        // 3. notify the remaining  drivers
-        // 4. if accept create a ride and mark the driver as busy
-        return this.driverSelectionStrategy.findDriver(this.drivers)
+    requestRide(passenger:Passenger , src:string , dst:string , ):Ride{
+            return new Ride(passenger , undefined , src , dst)
     }
 
-    createRide(passenger:Passenger , driver:Driver ):Ride{
-        return new Ride(driver , passenger)
+    findDriverForPassenger(rideDetails:Ride):Driver[] {
+        const selectedDrivers:Driver[] = this.driverSelectionStrategy.findDrivers(this.drivers)
+        this.DriverNotifier.sendNotificationToDrivers(selectedDrivers ,rideDetails )
+        return selectedDrivers
     }
 
-    addRideToTheList(ride:Ride){
-        this.rideList.push(ride);
+    assignRider(ride:Ride, driver:Driver ):void{
+        ride.assignDriver(driver)
+    }
+
+    bookRide(ride:Ride):void{
+        ride.status = RideStatus.booked;
+    }
+
+    startRide(ride:Ride):void{
+        ride.status = RideStatus.inProgress;
+    }
+
+    completeRide(ride:Ride):void{
+        ride.status = RideStatus.completed;
     }
 
     setDriverSelectionStrategy(driverSelectionStrategy:DriverStrategyInterface){
         this.driverSelectionStrategy = driverSelectionStrategy
     }
 
+    acceptRideRequest(ride:Ride ,  driver:Driver):void {
+         this.assignRider(ride , driver);
+}
 }
