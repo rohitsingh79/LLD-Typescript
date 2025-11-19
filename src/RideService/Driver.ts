@@ -1,6 +1,6 @@
 import {DriverObserverInterface} from "./DriverObserver/DriverObserverInterface";
 import {RideService} from "./RideService";
-import {Ride} from "./Ride";
+import {Ride, Ride1} from "./Ride";
 
 export enum RideType {
     Regular = "REGULAR",
@@ -27,7 +27,7 @@ export class Driver implements DriverObserverInterface{
         ${ride.passenger?.getPassenger()}`);
     }
 
-    acceptRideRequest(ride:Ride):void{
+    acceptRideRequest(ride:Ride1):void{
          this.rideService.acceptRideRequest( ride, this)
     }
 }

@@ -3,6 +3,7 @@ import {Driver, RideType} from "./Driver";
 import {Passenger} from "./Passenger";
 import {DriverSubject} from "./DriverObserver/DriverSubject";
 import {PremiumDriverSelector} from "./DriverSelectorStrategy/PremiumDriverSelector";
+import {Ride, RideBuilder} from "./Ride";
 
 
 const rideService = new RideService()
@@ -29,29 +30,30 @@ driverSubjectController.addDriver(driver1);
 driverSubjectController.addDriver(driver2);
 driverSubjectController.addDriver(driver3);
 
-// request a ride from passenger
+// build a ride
 
-const rideP1 = rideService.requestRide(passenger1 , '72.334' , '75.335')
+const rideBuilder = new RideBuilder()
+const ridePass1:Ride = rideBuilder.assignPassenger(passenger1).setSrc('82.334').setDest('85.335').build()
 
 // driver accepts the request
-driver2.acceptRideRequest(rideP1)
+driver2.acceptRideRequest(ridePass1)
 
-rideP1.getRideDetails()
+ridePass1.getRideDetails()
 
 // book the ride
-rideService.bookRide(rideP1);
+rideService.bookRide(ridePass1);
 
-rideP1.getRideDetails()
+ridePass1.getRideDetails()
 
 // start the ride
-rideService.startRide(rideP1);
+rideService.startRide(ridePass1);
 
-rideP1.getRideDetails()
+ridePass1.getRideDetails()
 
 // complete the ride
-rideService.completeRide(rideP1);
-
-rideP1.getRideDetails()
+rideService.completeRide(ridePass1);
+//
+ridePass1.getRideDetails()
 
 
 
