@@ -21,18 +21,17 @@ export class UPIPaymentStrategy implements PaymentStrategyInterface{
     }
 }
 
+// implementation of the payment gateway such as razorpay , pay pal
+interface GatewayInterface{
+    makePayment: (amount:number) => void
+}
+
 // abstraction for the payment method
 abstract class PaymentMethod implements PaymentStrategyInterface{
-    protected constructor( protected paymentGateway:GatewayInterface){
+     protected constructor( protected paymentGateway:GatewayInterface){
         this.paymentGateway = paymentGateway
     }
     pay(amount:number):void{}
-}
-
-// implementation of the payment gateway such as razorpay , pay pal
-
-interface GatewayInterface{
-    makePayment: (amount:number) => void
 }
 
 // razorPayGatewayInterface implementation
@@ -42,6 +41,25 @@ export class RazorPayGateway implements GatewayInterface {
     }
 }
 
+// connector which connected the abstraction with implementation
+export class CreditCardStrategy extends PaymentMethod {
+    constructor(paymentGateway:GatewayInterface){
+        super(paymentGateway);
+    }
+
+    // override the method
+    pay(amount:number):void{
+        console.log(`payment of ${amount} is being processed through credit card `);
+        this.paymentGateway.makePayment(amount);
+    }
+
+    getCreditCardName(name:string):void{
+        console.log('credit card name is visa')
+    }
+}
+
+
+// adapter pattern
 export class StripeGateway {
     chargeAmount(amount:number):void {
         console.log('stripe gateway is making the payment');
@@ -55,23 +73,6 @@ export class StripeAdapter implements GatewayInterface{
 
     }
 
-}
-
-// connector which connected the abstraction with implementation
-export class CreditCardStrategy extends PaymentMethod {
-   constructor(paymentGateway:GatewayInterface){
-       super(paymentGateway);
-   }
-
-   // override the method
-    pay(amount:number):void{
-       console.log(`payment of ${amount} is being processed through credit card `);
-       this.paymentGateway.makePayment(amount);
-    }
-
-    getCreditCardName(name:string):void{
-       console.log('credit card name is visa')
-    }
 }
 
 
