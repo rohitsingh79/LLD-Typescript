@@ -1,12 +1,19 @@
 import {Passenger} from "./Passenger";
 import {Driver} from "./Driver";
 
+// TODO: move to separate folder
 export enum RideStatus {
     requested = 'REQUESTED',
     booked = 'BOOKED',
     inProgress = 'IN_PROGRESS',
     completed = 'COMPLETED',
 
+}
+
+// TODO: move to separate folder
+export enum PaymentStatus {
+    paid = 'PAID',
+    notPaid = 'NOT_PAID',
 }
 
 // builder pattern
@@ -58,6 +65,8 @@ export class Ride {
     public status:RideStatus  = RideStatus.requested
     public src?:string;
     public dst?:string;
+    public fare?:number = 0
+    public paymentStatus:PaymentStatus = PaymentStatus.notPaid
     constructor(builder:RideBuilder) {
         this.passenger = builder.passenger;
         this.id = Ride.rideCounter+1;
@@ -87,5 +96,21 @@ export class Ride {
 
     getStatus():RideStatus{
         return this.status
+    }
+
+    setFare(fare:number):void {
+        this.fare = fare
+    }
+
+    setPaymentStatus(status:PaymentStatus):void {
+        this.paymentStatus = status;
+    }
+
+    getPaymentStatus():PaymentStatus{
+        return this.paymentStatus;
+    }
+
+    getFareDetails():number{
+        return this.fare || 0;
     }
 }

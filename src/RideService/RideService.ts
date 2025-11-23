@@ -48,4 +48,9 @@ export class RideService {
     acceptRideRequest(ride:Ride,  driver:Driver):void {
          this.assignRider(ride , driver);
 }
+
+    // TODO: send the list of drivers based on filtering and strategy used
+    getAvailableDrivers():void{
+
+    }
 }

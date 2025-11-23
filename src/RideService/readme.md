@@ -10,11 +10,3 @@
 7. The system should provide real-time tracking of ongoing rides and notify passengers and drivers about ride status updates.
 8. The system should handle concurrent requests and ensure data consistency.
 
-
-// driver and passenger class
-// ride class that holds info about ride driver , passenger start and destination
-// ride service that holds list of rides searches for drivers , matches the request and starts the ride
-
-// observer pattern to notify the drivers of the ride request
-// factory pattern to create drivers and the passenger
-// strategy pattern to find the rides 
