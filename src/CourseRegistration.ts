@@ -48,8 +48,11 @@ class CourseOfferings{
         this.cap = Builder.cap;
     }
     addStudent(student:Student):void{
-        console.log('student is assigned')
+        console.log(`${student.name} is registered for the course--> ${this.course?.name}`)
         this.regStudents.push(student);
+    }
+    decreaseCapacity():void{
+        this.cap-=1;
     }
 }
 class Professor{
@@ -82,7 +85,16 @@ abstract class RegistrationHandler{
 class PreReqHandler extends RegistrationHandler {
     handle(c:CourseOfferings , s:Student):void{
         // check logic for preRequisite
-        console.log('pre requiste is matched')
+        const completedCourseByStudent:Course[]= s.completedCourses;
+        const preReqToBeCompleted:Course | null | undefined = c?.course?.preReq;
+        const isPreReqCompleted = completedCourseByStudent.find((course) => course.id === preReqToBeCompleted?.id)
+        if(isPreReqCompleted){
+            console.log('pre requiste is matched for the course-->' ,isPreReqCompleted.name )
+        }
+        else {
+            throw new Error('pre requiste is missing')
+        }
+
         this.handleNext(c , s);
     }
     handleNext(course:CourseOfferings , student:Student):void{
@@ -94,8 +106,19 @@ class PreReqHandler extends RegistrationHandler {
 class CapacityHandler extends RegistrationHandler{
     handle(c:CourseOfferings , s:Student):void{
         // check logic for capacity
-        console.log('capacity planning is dine')
-        this.handleNext(c , s);
+        const capacity:number = c.cap;
+        if(capacity < c.regStudents.length){
+            throw new Error('capacity is full cannot register');
+        }
+        else{
+            console.log('there is capacity for student-->' , s.name);
+            // decrease the capacity
+            console.log('capacity before' , capacity)
+            c.decreaseCapacity();
+            console.log('after registering the capacity is' , c.cap)
+            this.handleNext(c , s);
+        }
+
     }
     handleNext(course:CourseOfferings , student:Student):void{
         course.addStudent(student);
@@ -136,7 +159,7 @@ class CRFacade{
 // demo
 // create course , student , professor
 const c1preReq = new Course('array-123' ,'array',)
-const c1 = new Course('id-123' ,'dsa' , c1preReq)
+const c1 = new Course('id-123' ,'DSA' , c1preReq)
 const s1 = new Student('id-456' , 'rohit' , [c1preReq]);
 const p1 = new Professor('id-789' , 'rekha')
 
@@ -145,12 +168,9 @@ const p1 = new Professor('id-789' , 'rekha')
 const courseBuilder = new CourseBuilder();
 const courseOffering:CourseOfferings = courseBuilder
     .addCourse(c1).assignProd(p1).addCap(2).build();
-console.log('before registering' ,courseOffering)
 
 // register a student for the course after checking preq and course capacity
 const regFacade = new CRFacade();
 regFacade.registerStudent(courseOffering , s1);
 
-
-console.log('after registering' ,JSON.stringify(courseOffering))
 
