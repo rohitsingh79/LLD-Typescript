@@ -37,13 +37,14 @@ class CourseBuilder{
 class CourseOfferings{
     public prof:Professor | null;
     public regStudents:Student[];
-    public waitList:Student[] | null;
+    public waitList:Student[] | null = [];
     public course:Course|null;
     public cap:number = 0;
+    public WaitListManager:WaitListManager | null = null
     constructor(Builder:CourseBuilder){
         this.prof = Builder.prof;
         this.regStudents = Builder.students;
-        this.waitList = null;
+        this.waitList = Builder.waitList;
         this.course = Builder.course;
         this.cap = Builder.cap;
     }
@@ -54,7 +55,16 @@ class CourseOfferings{
     decreaseCapacity():void{
         this.cap-=1;
     }
+    addObserver(listObserver:WaitListManager){
+        this.WaitListManager = listObserver
+    }
+
+    increaseCapacity():void{
+        this.cap+=1;
+        this.WaitListManager?.onSpotFree(this)
+    }
 }
+
 class Professor{
     public id:string = ''
     public name:string = ''
@@ -89,10 +99,10 @@ class PreReqHandler extends RegistrationHandler {
         const preReqToBeCompleted:Course | null | undefined = c?.course?.preReq;
         const isPreReqCompleted = completedCourseByStudent.find((course) => course.id === preReqToBeCompleted?.id)
         if(isPreReqCompleted){
-            console.log('pre requiste is matched for the course-->' ,isPreReqCompleted.name )
+            console.log('pre requisite is matched for the course-->' ,isPreReqCompleted.name )
         }
         else {
-            throw new Error('pre requiste is missing')
+            throw new Error('pre requisite is missing')
         }
 
         this.handleNext(c , s);
@@ -108,7 +118,10 @@ class CapacityHandler extends RegistrationHandler{
         // check logic for capacity
         const capacity:number = c.cap;
         if(capacity < c.regStudents.length){
-            throw new Error('capacity is full cannot register');
+            // throw new Error('capacity is full cannot register');
+            console.log(`${s.name} cannot be assigned course because ${c?.course?.name} course is full`)
+            c?.waitList?.push(s);
+            console.log(`added ${s.name} to the wait list`)
         }
         else{
             console.log('there is capacity for student-->' , s.name);
@@ -160,17 +173,43 @@ class CRFacade{
 // create course , student , professor
 const c1preReq = new Course('array-123' ,'array',)
 const c1 = new Course('id-123' ,'DSA' , c1preReq)
-const s1 = new Student('id-456' , 'rohit' , [c1preReq]);
+const s1 = new Student('id-456' , 'Ronit' , [c1preReq]);
+const s2 = new  Student('id-079' , 'Kalpit' , [c1preReq])
 const p1 = new Professor('id-789' , 'rekha')
 
 // create a course offering using builder
 
 const courseBuilder = new CourseBuilder();
 const courseOffering:CourseOfferings = courseBuilder
-    .addCourse(c1).assignProd(p1).addCap(2).build();
+    .addCourse(c1).assignProd(p1).addCap(1).build();
 
 // register a student for the course after checking preq and course capacity
 const regFacade = new CRFacade();
 regFacade.registerStudent(courseOffering , s1);
+regFacade.registerStudent(courseOffering , s2);
+
+// interface to notify the students when slot is free
+interface Notify{
+    onSpotFree(course:CourseOfferings):void;
+}
+
+// create a waitlist manager which observes if any student drops
+
+class WaitListManager implements Notify{
+    public registrationRequestService:RegistrationRequestService
+    constructor(service:RegistrationRequestService){
+        this.registrationRequestService = service
+    }
+    onSpotFree(course:CourseOfferings){
+            const waitingStudent:Student  = course?.waitList?.shift() as Student
+        this.registrationRequestService.handleRegistration(course ,waitingStudent);
+    }
+}
+
+const waitListManager = new WaitListManager(new RegistrationRequestService());
+courseOffering.addObserver(waitListManager)
+courseOffering.increaseCapacity();
+
+
 
 
