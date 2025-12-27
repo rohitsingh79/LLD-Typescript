@@ -26,6 +26,13 @@ interface GatewayInterface{
     makePayment: (amount:number) => void
 }
 
+// razorPayGatewayInterface implementation
+export class RazorPayGateway implements GatewayInterface {
+    makePayment(amount:number):void{
+        console.log(`razor pay will charge you with ${amount}`)
+    }
+}
+
 // abstraction for the payment method
 abstract class PaymentMethod implements PaymentStrategyInterface{
      protected constructor( protected paymentGateway:GatewayInterface){
@@ -34,14 +41,7 @@ abstract class PaymentMethod implements PaymentStrategyInterface{
     pay(amount:number):void{}
 }
 
-// razorPayGatewayInterface implementation
-export class RazorPayGateway implements GatewayInterface {
-    makePayment(amount:number):void{
-        console.log(`razor pay will charge you with ${amount}`)
-    }
-}
-
-// connector which connected the abstraction with implementation
+//  implementation
 export class CreditCardStrategy extends PaymentMethod {
     constructor(paymentGateway:GatewayInterface){
         super(paymentGateway);
